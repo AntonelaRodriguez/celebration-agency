@@ -38,7 +38,7 @@ export class UserService {
             where: {roleName: RoleName.USER}
         })
         if(!roleAdmin || !roleUser) throw new InternalServerErrorException(new MessageDto('Not roles created yet'));
-        const admin = this.userRepository.create(users);
+        const admin = await this.userRepository.create(users);
         admin.roles = [roleAdmin, roleUser];
         await this.userRepository.save(admin);
         return new MessageDto('Admin created');

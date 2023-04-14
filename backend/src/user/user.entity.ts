@@ -1,6 +1,7 @@
+import { hash } from "bcryptjs";
 import { Product } from "src/product/entities/product.entity";
 import { Role } from "src/role/role.entity";
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity({name: 'user'})
 export class User {
@@ -27,6 +28,13 @@ export class User {
         inverseJoinColumn: {name: 'role_id'}
     })
     roles: Role[];
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    async hashPassword() {
+        if(!this.password) return;
+        this.password = await hash(this.password,20)
+    }
     
     @OneToMany(()=> Product, product => product.author)
     products: Product[]

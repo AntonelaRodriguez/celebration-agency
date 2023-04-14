@@ -34,7 +34,7 @@ export class ProductService {
   paginate(options: IPaginationOptions): Observable<Pagination<Product>>{
     return from(paginate<Product>(this.productRepository, options)).pipe(
       map((productPageable: Pagination<Product>) => {
-        productPageable.items.forEach(function (v) {delete v.password});
+        productPageable.items.forEach(function (v) {delete v.passwor});
 
         return productPageable;
       })
@@ -79,7 +79,7 @@ export class ProductService {
     if(!product){
       throw new NotFoundException(new MessageDto('Event not exist'))
     }
-    await this.productRepository.delete(product);
+    await this.productRepository.remove(product);
     return new MessageDto('Event deleted')
   }
 

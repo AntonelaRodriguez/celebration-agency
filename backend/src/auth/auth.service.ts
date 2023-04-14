@@ -41,7 +41,7 @@ export class AuthService {
             where: {roleName: RoleName.USER}
         })
         if(!roleUser) throw new InternalServerErrorException(new MessageDto('Not roles created yet'));
-        const user = this.authRepository.create(dto);
+        const user = await this.authRepository.create(dto);
         user.roles = [roleUser];
         await this.authRepository.save(user);
         return new MessageDto('User created');
