@@ -16,7 +16,7 @@ export class ProductController {
     return await this.productService.create(products);
   }
 
-  @Get()
+  @Get() // http://localhost:8080/product?page=1&limit=10
   async getAll(
     @Query('page', ParseIntPipe) page: number,
     @Query('limit', ParseIntPipe) limit: number,
