@@ -20,5 +20,6 @@ export class Product {
 
     @ManyToOne(() => User, user => user.products)
     author: User
+    
     passwor: any;
 }

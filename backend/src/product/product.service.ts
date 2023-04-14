@@ -1,13 +1,10 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { MessageDto } from 'src/common/message.dto';
 import { UserService } from 'src/user/user.service';
-import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
-import { Observable, from, map } from 'rxjs';
-
 
 @Injectable()
 export class ProductService {
@@ -23,22 +20,13 @@ export class ProductService {
     return new MessageDto('Event created')
   }
 
-  async getAll(): Promise<Product[]> {
-    const list = await this.productRepository.find({relations: ['author']});
-    if(!list.length) {
-      throw new NotFoundException(new MessageDto('The list is empty'));
-    }
-    return list;
-  }
-
-  paginate(options: IPaginationOptions): Observable<Pagination<Product>>{
-    return from(paginate<Product>(this.productRepository, options)).pipe(
-      map((productPageable: Pagination<Product>) => {
-        productPageable.items.forEach(function (v) {delete v.passwor});
-
-        return productPageable;
-      })
-    )
+  async getAll(page:number, limit:number): Promise<[Product[], number]> {
+    const [product, total] = await this.productRepository.findAndCount({
+      relations: ['author'],
+      skip: (page-1) * limit,
+      take:limit,
+    })
+    return [product, total];
   }
 
   async findById(id: number): Promise<Product> {

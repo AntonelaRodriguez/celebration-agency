@@ -1,10 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe, Put, UsePipes, ValidationPipe, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { Observable } from 'rxjs';
-import { Pagination } from 'nestjs-typeorm-paginate';
 import { Product } from './entities/product.entity';
-import { SERVER_PORT } from 'src/config/constants';
 
 @Controller('product')
 export class ProductController {
@@ -20,15 +17,12 @@ export class ProductController {
   }
 
   @Get()
-  index(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    ): Observable<Pagination<Product>> {
-      limit = limit > 100 ? 100 : limit;
-
-    return this.productService.paginate({
-      page, limit: 10, route: `http://localhost${SERVER_PORT}/product`
-    });
+  async getAll(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+    ): Promise<{product: Product[]; total: number}> {
+      const [product, total] = await this.productService.getAll(page, limit)
+      return {product, total};
   }
 
   @Get(':id')
