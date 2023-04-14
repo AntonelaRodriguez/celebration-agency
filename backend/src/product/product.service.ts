@@ -5,6 +5,8 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { MessageDto } from 'src/common/message.dto';
 import { UserService } from 'src/user/user.service';
+import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
+import { Observable, from, map } from 'rxjs';
 
 
 @Injectable()
@@ -27,6 +29,16 @@ export class ProductService {
       throw new NotFoundException(new MessageDto('The list is empty'));
     }
     return list;
+  }
+
+  paginate(options: IPaginationOptions): Observable<Pagination<Product>>{
+    return from(paginate<Product>(this.productRepository, options)).pipe(
+      map((productPageable: Pagination<Product>) => {
+        productPageable.items.forEach(function (v) {delete v.password});
+
+        return productPageable;
+      })
+    )
   }
 
   async findById(id: number): Promise<Product> {
